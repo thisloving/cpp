@@ -4,82 +4,94 @@
 
 using namespace std;
 
-class MyString {
-public:	
-	MyString() {
-		data = nullptr;
-		len  = 0;
-	}
-
-	MyString(const char *p) {
-		len = strlen(p);
-		init_data(p);
-		cout << "construtor is called! source:" << p << endl;
-	}
-
-	MyString(const MyString& str) {
-		len = str.len;
-		init_data(str.data);
-		cout << "copy construtor is called! source:" << str.data << endl;
-	}
-
-	MyString& operator=(const MyString& str) {
-		if(this != &str) {
-			len = str.len;
-			init_data(str.data);
-		}
-
-		cout << "copy assignment is called! source:" << str.data << endl;
-		return *this;
-	}
-
-#if 1
-	MyString(MyString&& str) {
-		cout << "move construtor is called! source:" << str.data << endl;
-		len  = str.len;
-		data = str.data;
-		str.len  = 0;
-		str.data = nullptr;
-	}
-
-	MyString& operator=(MyString&& str) {
-		cout << "move assignment is called! source:" << str.data << endl;
-		if (this != &str) {
-			len = str.len;
-			data = str.data;
-			str.len = 0;
-			str.data = nullptr;
-		}
-
-		return *this;
-	}
-#endif
-
-	virtual ~MyString() {
-		if (data) {
-			free(data);
-		}
-	}
+class String {
+public:
+	String(const char* c_str=nullptr);
+	String(const String& str);
+	String& operator=(const String& str);
+	String(String&& str);
+	String& operator=(String&& str);
+	~String();
 
 private:
-	void init_data(const char* s) {
-		data = new char[len+1];
-		memcpy(data, s, len);
-		data[len] = '\0';
-	}
-
-private:
-	char*  data;
-	size_t len;
+	char* m_data;
 };
 
-int main()
-{
-	MyString str;
-	str = MyString("Hello");
-	
-	//MyString str2 = MyString("Hello2");
-
-	std::vector<MyString> vec;
-	vec.push_back(MyString("World"));
+inline String::String(const char *c_str) {
+	if (c_str != nullptr) {
+		int len = strlen(c_str);
+		m_data = new char[len+1];
+		memcpy(m_data, c_str, len);
+		m_data[len] = '\0';
+		
+		cout << "construtor is called! src:" << c_str << " dst:" << m_data << endl;
+	} else {
+		m_data = new char[1];
+		m_data[0] = '\0';
+	}	
 }
+
+inline String::String(const String& str) {
+	int len = strlen(str.m_data);
+	m_data = new char[len+1];
+	memcpy(m_data, str.m_data, len);
+	m_data[len] = '\0';
+
+	cout << "copy construtor is called! src:" << str.m_data << " dst:" << m_data << endl;
+}
+
+inline String& String::operator=(const String& str) {
+	if (this == &str) {
+		return *this;
+	}
+
+	delete []m_data;
+	int len = strlen(str.m_data);
+	m_data = new char[len+1];
+	memcpy(m_data, str.m_data, len);
+	m_data[len] = '\0';
+
+	cout << "copy assignment is called! src:" << str.m_data << " dst:" << m_data << endl;
+
+	return *this;
+}
+
+inline String::String(String&& str) {
+	m_data = str.m_data;
+	str.m_data = nullptr;
+
+	cout << "move construtor is called! src:" << (str.m_data ? str.m_data :"") << " dst:"<< m_data << endl;
+}
+
+inline String& String::operator=(String&& str) {
+	if (this != &str) {
+		return *this;
+	}
+
+	m_data = str.m_data;
+	str.m_data = nullptr;
+
+	cout << "move assignment is called! src:" << (str.m_data ? str.m_data:"") << " dst:" << m_data << endl;
+
+	return *this;
+}
+
+String::~String() {
+	cout << "destructor is called!" << (m_data ? m_data : "") << endl;
+	delete []m_data;
+}
+
+int main() 
+{
+	String str;
+	str = String("Hello");
+
+	String str2 = String("World");
+
+	std::vector<String> vec;
+	vec.push_back(String("!"));
+
+	return 0;
+}
+
+//g++ -std=c++20 -g string.cpp -o string
