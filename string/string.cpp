@@ -64,7 +64,7 @@ inline String::String(String&& str) {
 }
 
 inline String& String::operator=(String&& str) {
-	if (this != &str) {
+	if (this == &str) {
 		return *this;
 	}
 
