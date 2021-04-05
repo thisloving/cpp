@@ -68,6 +68,10 @@ inline String& String::operator=(String&& str) noexcept {
 		return *this;
 	}
 
+	if (m_data) {
+		delete []m_data
+	}
+
 	m_data = str.m_data;
 	str.m_data = nullptr;
 
@@ -78,7 +82,10 @@ inline String& String::operator=(String&& str) noexcept {
 
 String::~String() {
 	cout << "destructor is called!" << (m_data ? m_data : "") << endl;
-	delete []m_data;
+	
+	if (m_data) {
+		delete []m_data;
+	}
 }
 
 int main() 
