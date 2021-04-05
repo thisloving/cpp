@@ -56,14 +56,14 @@ inline String& String::operator=(const String& str) {
 	return *this;
 }
 
-inline String::String(String&& str) {
+inline String::String(String&& str) noexcept {
 	m_data = str.m_data;
 	str.m_data = nullptr;
 
 	cout << "move construtor is called! src:" << (str.m_data ? str.m_data :"") << " dst:"<< m_data << endl;
 }
 
-inline String& String::operator=(String&& str) {
+inline String& String::operator=(String&& str) noexcept {
 	if (this == &str) {
 		return *this;
 	}
